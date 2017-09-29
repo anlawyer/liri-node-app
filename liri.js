@@ -7,9 +7,9 @@ var spotify = new Spotify(keys.spotifyKeys);
 var fs = require('fs');
 
 var args = process.argv;
-var input = process.argv[2];
+var func = process.argv[2];
 
-switch(input) {
+switch(func) {
 
 	case 'my-tweets':
 		tweetsFn();
@@ -81,7 +81,7 @@ function moviesFn() {
 	var movie = '';
 
 	if (process.argv[3] === undefined) {
-		movie = "mr.+nobody"
+		movie = "mr nobody"
 	} else  if (args.length === 4){
 		movie = process.argv[3]
 	} else {	
@@ -152,26 +152,16 @@ function doIt() {
 	getInputs();
 };
 
-var toLog = '';
-
 function getInputs() {
-	toLog += '\n' + '--------' + '\n';
+	var toLog = '\n' + '--------' + '\n';
 
 	for (var i = 2; i < args.length; i++) {
 		toLog += args[i] + ' '
 	};
 
-	console.log(toLog);
-	writeToLog();
-};
-
-function writeToLog() {
 	fs.appendFile('log.txt', toLog, function(error) {
 		if (error) {
 		    console.log(error);
-		} else {
-			console.log('Added to log')
-			console.log('--------------')
-		}
-	})
+		};
+	});
 };

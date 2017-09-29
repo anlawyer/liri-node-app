@@ -32,7 +32,7 @@ switch(input) {
 };
 
 function tweetsFn() {
-	client.get('statuses/user_timeline', function(error, tweets, response) {
+	client.get('statuses/user_timeline', {count: 20}, function(error, tweets, response) {
 		
 		if (error) {
 			console.log(error)
@@ -45,6 +45,8 @@ function tweetsFn() {
 			console.log('============================================')
 		};
 	});
+	
+	getInputs();
 };
 
 function spotifyFn() {
@@ -52,7 +54,7 @@ function spotifyFn() {
 	var song = '';
 
 	if (process.argv[3] === undefined) {
-		song = "The Sign"
+		song = "The Sign Ace of Base"
 	} else {	
 		for (var i = 3; i < args.length; i++) {
 			song += args[i] + ' '
@@ -65,11 +67,13 @@ function spotifyFn() {
     		console.log(error);
   		}
 
-		console.log('Artists\n', data.tracks.items[0].artists[0].name); 
-		console.log('Name\n', data.tracks.items[0].name); 
-		console.log('Spotify url\n', data.tracks.items[0].external_urls.spotify); 
-		console.log('Album\n', data.tracks.items[0].album.name);
+		console.log('Artists:\n', data.tracks.items[0].artists[0].name); 
+		console.log('Song Name:\n', data.tracks.items[0].name); 
+		console.log('Spotify url:\n', data.tracks.items[0].external_urls.spotify); 
+		console.log('Album:\n', data.tracks.items[0].album.name);
 	});
+
+	getInputs();
 };
 
 function moviesFn() {
@@ -86,30 +90,20 @@ function moviesFn() {
 		}
 	};
 
-	console.log(movie)
-
-  //  * Title of the movie.
-  //  * Year the movie came out.
-  //  * IMDB Rating of the movie.
-  //  * Rotten Tomatoes Rating of the movie.
-  //  * Country where the movie was produced.
-  //  * Language of the movie.
-  //  * Plot of the movie.
-  //  * Actors in the movie.
-
 	request('http://www.omdbapi.com/?apikey=40e9cece&t=' + movie, function(error, response, body) {
 		if (error) {
 			console.log(error)
 		} else {
 			var output = JSON.parse(body)
-			//console.log(output)
 			// title
 			console.log('Title:\n', output.Title)
 			// release year
 			var releaseYear = output.Released.split(' ')
 			console.log('Release Year:\n', releaseYear[2]) 
 			// ratings
-			if (output.Ratings.length === 1) {
+			if (output.Ratings.length === 0) {
+				console.log('no ratings!')
+			} else if (output.Ratings.length === 1) {
 				console.log('IMBD rating:\n', output.Ratings[0].Value)
 			} else {
 				console.log('IMBD rating:\n', output.Ratings[0].Value)
@@ -125,6 +119,8 @@ function moviesFn() {
 			console.log('Actors:\n', output.Actors)
 		}
 	});
+
+	getInputs();
 };
  
 function doIt() {
@@ -138,12 +134,13 @@ function doIt() {
 		var fn = contents[0];
 		var dat = contents[1];
 
+		console.log(fn, dat);
+
 		if (fn === 'my-tweets') {
 			tweetsFn();
 		}
 
 		if (fn === 'spotify-this-song') {
-			console.log(fn, dat);
 			spotifyFn();
 		}
 
@@ -151,4 +148,30 @@ function doIt() {
 			moviesFn();
 		}
 	});
+
+	getInputs();
+};
+
+var toLog = '';
+
+function getInputs() {
+	toLog += '\n' + '--------' + '\n';
+
+	for (var i = 2; i < args.length; i++) {
+		toLog += args[i] + ' '
+	};
+
+	console.log(toLog);
+	writeToLog();
+};
+
+function writeToLog() {
+	fs.appendFile('log.txt', toLog, function(error) {
+		if (error) {
+		    console.log(error);
+		} else {
+			console.log('Added to log')
+			console.log('--------------')
+		}
+	})
 };
